@@ -1,8 +1,10 @@
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
 # Projet de recherche Opérationnelle (one machine sequencing problem)
 
 ## Description du problème
 
-Nous aurons un ensemble $N = \{1,\dots,n\}$ de n tâche à affecter à une machine.
+Nous aurons un ensemble $ N = \{ 1,\dots,n \} $ de n tâche à affecter à une machine.
 
 Pour chaque tâche $i \in N$, nous aurons une date $a_i$, tel que la tâche i ne pourra pas commencer avant cette date.
 
