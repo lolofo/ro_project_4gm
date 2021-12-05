@@ -23,7 +23,9 @@ from Node import *
 
 
 
-
+###############################
+### The algorithm ###
+###############################
 
 def branch_n_bound(N , a , d , q , msg = 0) :
 
@@ -107,7 +109,9 @@ def branch_n_bound(N , a , d , q , msg = 0) :
     return {'UB' : UB , 'LB' : LB , 'SCHD': incumbent , 'Tree' : Tree}
 
 
-
+###############################
+### Tree construction ###
+###############################
 
 def construct_tree(Tree) :
     '''
@@ -151,7 +155,9 @@ def construct_tree(Tree) :
     print("nodes",bb_tree.nodes())
     return bb_tree
 
-
+###############################
+### tools to print the tree ###
+###############################
 
 def bb_tree_ready_to_print(Tree , Larg = 7 , Haut = 7):
 
@@ -191,7 +197,9 @@ def bb_tree_ready_to_print(Tree , Larg = 7 , Haut = 7):
     return G , options
 
 
-
+###############################
+### Solve the problem ###
+###############################
 
 def solve_schrage_heuristic(N,a,d,q , show_output = True ,graphics = True , larg = 7 , haut = 7):
 
@@ -249,6 +257,8 @@ def solve_schrage_heuristic(N,a,d,q , show_output = True ,graphics = True , larg
     
 
 if __name__ == "__main__":
+
+    # first test with the example of the subject
 
     N = list(range(1,8))
     a = [10,13,11,20,30,0,30]
