@@ -356,6 +356,11 @@ setattr(Node,"_lower_bound",_lower_bound)
 
 
 
+################################
+### Nodes creation / branching rule ###
+################################
+
+
 def _nodes_creation(self , J , jc):
 
     ''' 
@@ -399,4 +404,5 @@ def _nodes_creation(self , J , jc):
     e2._edge = a_jc
 
     return([e1,e2])
+    
 setattr(Node,"_nodes_creation",_nodes_creation)
