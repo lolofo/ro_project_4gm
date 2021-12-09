@@ -1,5 +1,9 @@
 
 from pulp import *
+import time
+
+import plotly.express as px  # --> data visualisation
+import pandas as pd
 
 
 def instance_creation(N,a,d,q) :
@@ -26,7 +30,11 @@ def instance_creation(N,a,d,q) :
 ### definition of the model ###
 
 def pulp_model(N,a,d,q):
-  # Input :
+  '''
+  input  : N,a,d,q --> values of the one machine sequencing problem.
+
+  output : model   --> pulp model of the problem.
+  '''
 
 
 
@@ -79,6 +87,88 @@ def pulp_model(N,a,d,q):
 
 
 
+#######################
+### solve the model ###
+#######################
+
+def solve_pulp_model(N,a,d,q , show_output = True):
+
+  N,a,d,q = instance_creation(N,a,d,q)
+
+  start = time.time()
+  model = pulp_model(N,a,d,q)                    # the model
+  end_time = time.time()-start
+  model.solve(COIN_CMD(msg=0 , mip=1)) # solve the model
+
+  if (LpStatus[model.status]=="Optimal"):
+
+    # the solution :
+    varsdict = {} # contain the variables
+
+    for v in model.variables():
+      if("t_" in v.name) :
+        varsdict[v.name] = v.varValue
+    
+    t = {k: v for k, v in sorted(varsdict.items(), key=lambda item: item[1])} # sort of the dictionnary (by values)
+
+    schedule = [int(k.replace('t_', '')) for k in t]
+
+    if show_output :
+
+      print("Running time : ",end_time)
+      print("Solution value : ",value(model.objective))
+      print("MIP schedule : ",schedule)
+
+    return {"SCHD" : schedule , "OBJ" : value(model.objective)}
+
+  else :
+    # problem not solved
+    print("error : problem not solved")
+
+
+
+def pulp_schedule_visu(N,a,d,q , show_text = True):
+  '''
+  objectif : show the solution as a calendar --> use of plotly.express
+  '''
+  solution = solve_pulp_model(N,a,d,q , show_output = show_text)
+
+  N,a,d,q = instance_creation(N,a,d,q) # need of python dictionnary
+
+  df = []
+
+  curr = 0
+
+  for n in solution['SCHD'] :
+    T = "Job-"+str(n)
+
+    if curr != 0 :
+      df += [dict(Task = T , Start = 0 , Finish = a[n] , color = "Waiting")]
+
+    # period when the job is in process
+    start = max(a[n],curr)
+    end = start+d[n]
+    curr = end
+    df += [dict(Task = T , Start = start , Finish = end , color = "Processing")]
+
+    # queuing period
+
+    start = end
+    end = start+q[n]
+    df += [dict(Task = T , Start = start , Finish = end , color = "Queuing")]
+
+
+  df = pd.DataFrame(df)
+  df['delta'] = df['Finish'] - df['Start']
+
+  fig = px.timeline(df, x_start = "Start", x_end = "Finish" , y = "Task",title = "schedule timeline with end at t = {}".format(solution['OBJ']))
+  fig.layout.xaxis.type = 'linear'
+  fig.update_yaxes(autorange="reversed")
+  fig.data[0].x = df.delta.tolist()
+  fig.show()
+
+
+
 if __name__ == "__main__" :
 
 
@@ -88,10 +178,4 @@ if __name__ == "__main__" :
     q = [7,26,24,21,8,17,0]
 
 
-    N,a,d,q = instance_creation(N,a,d,q)
-
-    model1 = pulp_model(N,a,d,q)
-
-    model1.solve(COIN_CMD(msg=0 , mip=1))
-    print("Status of the solution = ", LpStatus[model1.status]) 
-    print("Result : ", value(model1.objective))
+    pulp_schedule_visu(N,a,d,q)
