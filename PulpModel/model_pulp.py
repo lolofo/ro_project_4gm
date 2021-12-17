@@ -127,48 +127,6 @@ def solve_pulp_model(N,a,d,q , show_output = True):
 
 
 
-def pulp_schedule_visu(N,a,d,q , show_text = True):
-  '''
-  objectif : show the solution as a calendar --> use of plotly.express
-  '''
-  solution = solve_pulp_model(N,a,d,q , show_output = show_text)
-
-  N,a,d,q = instance_creation(N,a,d,q) # need of python dictionnary
-
-  df = []
-
-  curr = 0
-
-  for n in solution['SCHD'] :
-    T = "Job-"+str(n)
-
-    if curr != 0 :
-      df += [dict(Task = T , Start = 0 , Finish = a[n] , color = "Waiting")]
-
-    # period when the job is in process
-    start = max(a[n],curr)
-    end = start+d[n]
-    curr = end
-    df += [dict(Task = T , Start = start , Finish = end , color = "Processing")]
-
-    # queuing period
-
-    start = end
-    end = start+q[n]
-    df += [dict(Task = T , Start = start , Finish = end , color = "Queuing")]
-
-
-  df = pd.DataFrame(df)
-  df['delta'] = df['Finish'] - df['Start']
-
-  fig = px.timeline(df, x_start = "Start", x_end = "Finish" , y = "Task",title = "schedule timeline with end at t = {}".format(solution['OBJ']))
-  fig.layout.xaxis.type = 'linear'
-  fig.update_yaxes(autorange="reversed")
-  fig.data[0].x = df.delta.tolist()
-  fig.show()
-
-
-
 if __name__ == "__main__" :
 
 
@@ -176,6 +134,3 @@ if __name__ == "__main__" :
     a = [10,13,11,20,30,0,30]
     d = [5,6,7,4,3,6,2]
     q = [7,26,24,21,8,17,0]
-
-
-    pulp_schedule_visu(N,a,d,q)
