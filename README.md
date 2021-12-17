@@ -1,12 +1,14 @@
-# Projet de recherche Opérationnelle (one machine sequencing problem)
+# Operational research project (one machine sequencing problem)
 
-## Travail sur le sujet
+## Work on the subject
 
-Le but est de mettre en place un algorithme de branch and bound. Nous aurons deux types d'algorithmes de branch and bound à coder.
+The goal is to implement a branch and bound algorithm. We will have two types of branch and bound algorithms to code.
 
-* Le premier algorithme se basera sur la technique de **Schrage** pour trouver des bornes supérieures et inférieures à chaque noeud de branchement. Tout sera passée sur cette procédure de Schrage. A chaque noeuds nous aurons à faire cette procédure et un critère nous permettra de brancher.
+* The first algorithm will be based on the **Schrage** technique to find upper and lower bounds at each branch node. Everything will be based on this Schrage procedure. At each node we will have to do this procedure and a criterion will allow us to branch.
 
-* un second algorithme de branch and bound pourra se baser sur de la programmation mixte. C'est en fait la version classique de cet algorithme. A chaque noeuds on considère une relaxation linéaire, que l'on résoud (algorithme du simplexe/simplexe dual).
+* a second branch and bound algorithm can be based on mixed programming. It is in fact the classical version of this algorithm. At each node we consider a linear relaxation, which we solve (dual simplex/simplex algorithm).
+
+Translated with www.DeepL.com/Translator (free version)
 
 
 
