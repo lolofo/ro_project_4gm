@@ -17,6 +17,10 @@ import os
 
 from Node import *
 
+#from inst_gen import *
+
+
+
 
 
 
@@ -24,8 +28,33 @@ from Node import *
 
 
 ###############################
-### The algorithm ###
+    ### The algorithm ###
 ###############################
+
+
+def search_current_index(Queue,Tree) :
+    '''
+    objectiv : search of the node not treated with the highest lower bound
+
+    input : Queue --> list of index (index of the nodes not treated in the Tree)
+            Tree  --> list of nodes
+
+    output : index of the node with the highest lower bound in the tree (not treated)
+    '''
+
+    res = Queue[0]
+    LB = Tree[res]._LB
+
+    for idx in Queue :
+
+        if Tree[idx]._LB>LB :
+
+            res = idx
+            LB = Tree[res]._LB
+
+    return res
+
+
 
 def branch_n_bound(N , a , d , q , msg = 0) :
 
@@ -33,7 +62,6 @@ def branch_n_bound(N , a , d , q , msg = 0) :
     Queue = []      # list of nodes to process (a list of integers with the index of nodes to process in the Tree)
     UB = math.inf   # set the upper bound to a sufficiently large number
                     
-    eps = 0.0001      # an optimality tolerance of %0.01
     incumbent = []  # initialize the incumbent solution
 
     root = Node(N , a , d , q)      # at the root node no variables are fixed
@@ -46,7 +74,7 @@ def branch_n_bound(N , a , d , q , msg = 0) :
     
     order = 0
 
-    while (Queue!=[] and np.abs(UB-LB)>eps) :                     #   while there is nodes to treat :
+    while (Queue!=[] and np.abs(UB-LB)>=1) :                     #   while there is nodes to treat :
         
         currentindex = Queue[0]             # note that we follow a first-in-first-out node processing strategy
         currentnode = Tree[currentindex]
@@ -97,20 +125,17 @@ def branch_n_bound(N , a , d , q , msg = 0) :
             e1._LB = max(currentLB , e1._lower_bound(output['J']) , e1._lower_bound(output['J']+[output['jc']] ))
             e2._LB = max(currentLB , e2._lower_bound(output['J']) , e2._lower_bound(output['J']+[output['jc']] ))
         
-
         LB = min([Tree[n]._LB for n in Queue]) # global lower
-        
-        
         Queue.remove(currentindex)
 
-
+        
         
 
     return {'UB' : UB , 'LB' : LB , 'SCHD': incumbent , 'Tree' : Tree}
 
 
 ###############################
-### Tree construction ###
+  ### Tree construction ###
 ###############################
 
 def construct_tree(Tree) :
@@ -152,7 +177,6 @@ def construct_tree(Tree) :
                         bb_tree.add_weighted_edges_from([(buff._order , n._order , n._edge)])
                         marked.append(n)
 
-    print("nodes",bb_tree.nodes())
     return bb_tree
 
 ###############################
@@ -193,7 +217,7 @@ def bb_tree_ready_to_print(Tree , Larg = 7 , Haut = 7):
     'pos' : pos,
     'with_labels': True,
     }
-    print(len(pos))
+
     return G , options
 
 
@@ -220,38 +244,40 @@ def solve_schrage_heuristic(N,a,d,q , show_output = True ,graphics = True , larg
         print("running time : ",end)
         print()
     
+
+    G=nx.grid_2d_graph(1,2)  #1x2 grid
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2,figsize=(4*larg,2*haut))
+
+    # the conjunctive graph
+    lg_path = r._longest_path(solution['SCHD'])['path']
+    G , options , labels , pos = r._graph_ready_to_print(solution['SCHD'] , lg_path )
+    labels = nx.get_edge_attributes(G,'weight')        
+
+    plt.subplot(121)
+    nx.draw(G,**options)
+    nx.draw_networkx_edge_labels(G,edge_labels = labels,pos = pos)
+    plt.title("the solution")
+    
+    
+    G , options = bb_tree_ready_to_print(solution['Tree'])
+    lvl = max([t._level for t in solution['Tree']])
+    pos = options['pos']
+    labels = nx.get_edge_attributes(G,'weight')
+    
+    plt.subplot(122)
+    nx.draw(G,**options)
+    nx.draw_networkx_edge_labels(G,edge_labels = labels,pos = pos)
+    plt.title('the branching tree of level : {}'.format(lvl))
+
+
+    solution['time'] = end
+
     if graphics :
-
-        G=nx.grid_2d_graph(1,2)  #1x2 grid
-        
-        fig, (ax1, ax2) = plt.subplots(1, 2,figsize=(4*larg,2*haut))
-
-        # the conjunctive graph
-        lg_path = r._longest_path(solution['SCHD'])['path']
-        G , options , labels , pos = r._graph_ready_to_print(solution['SCHD'] , lg_path )
-        labels = nx.get_edge_attributes(G,'weight')        
-
-        plt.subplot(121)
-        nx.draw(G,**options)
-        nx.draw_networkx_edge_labels(G,edge_labels = labels,pos = pos)
-        plt.title("the solution")
-        
-        
-        G , options = bb_tree_ready_to_print(solution['Tree'])
-        lvl = max([t._level for t in solution['Tree']])
-        pos = options['pos']
-        labels = nx.get_edge_attributes(G,'weight')
-        
-        plt.subplot(122)
-        nx.draw(G,**options)
-        nx.draw_networkx_edge_labels(G,edge_labels = labels,pos = pos)
-        plt.title('the branching tree of level : {}'.format(lvl))
-
-
         plt.show()
-
-
-    return solution
+        return solution
+    else :
+        return solution,fig
         
 
     
@@ -259,17 +285,31 @@ def solve_schrage_heuristic(N,a,d,q , show_output = True ,graphics = True , larg
 if __name__ == "__main__":
 
     # first test with the example of the subject
-
+ 
     N = list(range(1,8))
     a = [10,13,11,20,30,0,30]
     d = [5,6,7,4,3,6,2]
     q = [7,26,24,21,8,17,0]
 
+    #N,a,d,q = instance_in_circle(700 , radius = 15 , origin = [100,100,100])
+    solution , fig1 = solve_schrage_heuristic(N,a,d,q , graphics = False)
+    print(solution)
 
-    solution = solve_schrage_heuristic(N,a,d,q)
-                
-        
-        
+    plt.savefig("test.png")
+
+    '''
+
+    fig = plt.figure(figsize = (10, 7))
+    ax = plt.axes(projection ="3d")
+    
+    # Creating plot
+    ax.scatter3D(a, d, q, color = "green")
+    plt.title("Task simulated")
+    
+    # show plot
+    plt.show()
+
+    '''
 
     
 
