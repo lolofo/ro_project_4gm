@@ -99,8 +99,8 @@ setattr(Node , "_construct_conjonctive" , _construct_conjonctive)
 
 
 def _graph_ready_to_print(self , schedule , path ) :
-    ''' 
-    Return the conjunctive graph ready to print
+    '''
+    same function but return a matplotlib object ready to print.
     '''
     
     G = self._construct_conjonctive(schedule)
@@ -111,13 +111,18 @@ def _graph_ready_to_print(self , schedule , path ) :
 
     for k in range(len(path)) :
         curr = path[k] # current note
-        if k==0 :
+        if k==0 and len(path)>1:
             next = path[k+1]
             G['s'][curr]['color'] = 'red'
             G[curr][next]['color'] = 'red'
 
         elif k == len(path)-1 :
-            G[curr]['t']['color'] = 'red'
+            if len(path)==1 :
+                
+                G['s'][path[0]]['color'] = 'red'
+                G[path[0]]['t']['color'] = 'red'
+            else :
+                G[curr]['t']['color'] = 'red'
 
         else :
 
@@ -251,7 +256,7 @@ def _schrage_schedule(self) :
         #       Step 1
         n = len(self._N)
         U = []
-        b_U = self._N.copy()
+        b_U = self._N.copy() #  Copy of all the tasks
         t = min([self._a[i] for i in b_U])
 
         #       step 2 and 3
@@ -272,10 +277,16 @@ def _schrage_schedule(self) :
                 ti = t
                 buff = [self._a[j] for j in b_U]
 
-                if len(buff)==0 :
+
+                '''
+                two cases : --> b_U is empty
+                            --> still got one element (at least)
+                '''
+                
+                if len(b_U)==0 :
                         t = ti + self._d[i]
                 else :
-                        t = max(ti + self._d[i] , min(buff))
+                        t = max(ti + self._d[i] , min([self._a[i] for i in b_U]))
 
         return U
 
