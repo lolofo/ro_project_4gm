@@ -8,8 +8,6 @@ The goal is to implement a branch and bound algorithm. We will have two types of
 
 * a second branch and bound algorithm can be based on mixed programming. It is in fact the classical version of this algorithm. At each node we consider a linear relaxation, which we solve (dual simplex/simplex algorithm).
 
-Translated with www.DeepL.com/Translator (free version)
-
 
 
 
