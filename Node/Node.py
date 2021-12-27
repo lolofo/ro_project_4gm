@@ -208,7 +208,7 @@ def _longest_path(self, schedule):
             next = schedule[i+1]            # next node in the order.
             new_L = L[curr]+self._d[curr]
             
-            if (new_L > L[next]) :
+            if (new_L >= L[next]) :
                 L[next] = new_L
                 pred[next] = curr
         
@@ -217,7 +217,7 @@ def _longest_path(self, schedule):
                                             
         new_t = L[curr]+self._d[curr]+self._q[curr]
 
-        if new_t > L['t'] :
+        if new_t >= L['t'] :
             pred['t'] = curr
             L['t'] = new_t
 
