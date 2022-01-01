@@ -32,25 +32,25 @@ from Node import *
 ###############################
 
 
-def search_current_index(Queue,Tree) :
+def search_current_index(Queue,Tree,UB) :
     '''
-    objectiv : search of the node not treated with the highest lower bound
+    objectiv : search of the node not treated with the LB closest to UB
 
-    input : Queue --> list of index (index of the nodes not treated in the Tree)
-            Tree  --> list of nodes
+    input :    Queue --> list of index (index of the nodes not treated in the Tree)
+               Tree  --> list of nodes
 
-    output : index of the node with the highest lower bound in the tree (not treated)
+    output :   index of the node with the highest lower bound in the tree (not treated)
     '''
 
     res = Queue[0]
     LB = Tree[res]._LB
+    buff = np.abs(UB-LB) # calculate the distance between local LB and UB
 
     for idx in Queue :
-
-        if Tree[idx]._LB>LB :
+        if np.abs(Tree[idx]._LB - UB) <= buff :
 
             res = idx
-            LB = Tree[res]._LB
+            buff = np.abs(Tree[idx]._LB - UB)
 
     return res
 
@@ -76,7 +76,7 @@ def branch_n_bound(N , a , d , q , msg = 0) :
 
     while (Queue!=[] and np.abs(UB-LB)>=1) :                     #   while there is nodes to treat :
         
-        currentindex = Queue[0]             # note that we follow a first-in-first-out node processing strategy
+        currentindex = search_current_index(Queue, Tree , UB)    # note that we follow a first-in-first-out node processing strategy
         currentnode = Tree[currentindex]
 
         #   evaluation step :
@@ -293,11 +293,6 @@ if __name__ == "__main__":
 
     #N,a,d,q = instance_in_circle(700 , radius = 15 , origin = [100,100,100])
     solution , fig1 = solve_schrage_heuristic(N,a,d,q , graphics = False)
-    print(solution)
-
-    plt.savefig("test.png")
-
-    '''
 
     fig = plt.figure(figsize = (10, 7))
     ax = plt.axes(projection ="3d")
@@ -308,8 +303,6 @@ if __name__ == "__main__":
     
     # show plot
     plt.show()
-
-    '''
 
     
 
