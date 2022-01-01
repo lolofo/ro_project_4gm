@@ -54,6 +54,36 @@ class Node :
         self._level = 1
 
 
+#################
+### to_string ###
+#################
+
+
+def __str__(self) :
+  '''
+  Print the tasks
+  '''
+
+  # Creation of a dictionary of tasks 
+  #   - key: the number of the task, 
+  #   - values: the value of a, d and q for this task
+  dict_tasks = {}
+
+  for i in self._N :
+    list_task = []
+    list_task.append(self._a[i])
+    list_task.append(self._d[i])
+    list_task.append(self._q[i])
+    dict_tasks["task "+str(i)] = list_task
+    
+  # Placement in a dataframe
+  df_tasks = pd.DataFrame(dict_tasks)
+  df_tasks.index = ["a", "d", "q"]
+  return df_tasks.to_string()
+
+setattr(Node , "__str__" , __str__)
+
+
 #############################
 ### The conjunctive graph ###
 #############################
