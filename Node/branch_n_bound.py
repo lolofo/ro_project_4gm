@@ -286,10 +286,11 @@ if __name__ == "__main__":
 
     # first test with the example of the subject
  
-    N = list(range(1,8))
-    a = [10,13,11,20,30,0,30]
-    d = [5,6,7,4,3,6,2]
-    q = [7,26,24,21,8,17,0]
+    
+    a = [105,  42 ,  41  , 81,  52,  108,   5,  37,  107,   14]
+    d  =  [7 , 28  , 30 ,  24 , 19 ,  11 , 17 ,  5 ,   3 ,   1]
+    q  = [15 , 25 , 105 , 142 , 31 ,  87 , 85 , 47,  135,  138]
+    N = list(range(len(a)))
 
     #N,a,d,q = instance_in_circle(700 , radius = 15 , origin = [100,100,100])
     solution , fig1 = solve_schrage_heuristic(N,a,d,q , graphics = False)
